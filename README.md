@@ -2,7 +2,7 @@
 Backend for a task tracker (users, tasks, email, summarization).
 
 ## Stack
-- Java 21, Spring Boot, Maven
+- Java 17, Spring Boot, Maven
 - PostgreSQL, Kafka
 - Docker Compose, Liquibase
 
