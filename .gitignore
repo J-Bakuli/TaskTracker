@@ -42,6 +42,10 @@ plan.md
 ### VS Code ###
 .vscode/
 
+### Postman ###
+postman/
+.postman/
+
 ### Eclipse ###
 .settings/
 .sts4-cache/
