@@ -24,15 +24,22 @@ public class AuthController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/user")
-    public UserResponse register(
-            @Valid @RequestBody SignUpRequest request
-    ) {
-        return authService.register(request);
     public SignUpResponse register(@Valid @RequestBody SignUpRequest request, HttpServletResponse response) {
         UserEntity userEntity = authService.register(request);
-        String jwtToken = jwtService.generateToken(userEntity);
-        response.setHeader("Authorization", "Bearer " + jwtToken);
+        issueTokenAndSetHeader(userEntity, response);
         return new SignUpResponse(userEntity.getId(), userEntity.getEmail());
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/auth/login")
+    public SignInResponse signIn(@Valid @RequestBody SignInRequest request, HttpServletResponse response) {
+        UserEntity userEntity = authService.authenticate(request);
+        issueTokenAndSetHeader(userEntity, response);
+        return new SignInResponse(userEntity.getId(), userEntity.getEmail());
+    }
+
+    private void issueTokenAndSetHeader(UserEntity userEntity, HttpServletResponse response) {
+        String jwtToken = jwtService.generateToken(userEntity);
+        response.setHeader("Authorization", "Bearer " + jwtToken);
     }
 }

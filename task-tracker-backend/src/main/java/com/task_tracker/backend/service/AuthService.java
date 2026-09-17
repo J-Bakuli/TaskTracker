@@ -3,6 +3,7 @@ package com.task_tracker.backend.service;
 import com.task_tracker.backend.dto.SignInRequest;
 import com.task_tracker.backend.dto.SignUpRequest;
 import com.task_tracker.backend.exception.EmailAlreadyExistsException;
+import com.task_tracker.backend.exception.InvalidCredentialsException;
 import com.task_tracker.backend.model.UserEntity;
 import com.task_tracker.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,12 +41,17 @@ public class AuthService {
     }
 
     public UserEntity authenticate(SignInRequest signInRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        signInRequest.email(),
-                        signInRequest.password())
-        );
-
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            signInRequest.email(),
+                            signInRequest.password())
+            );
+        } catch (BadCredentialsException e) {
+            log.warn("Sign-in failed for email={}", signInRequest.email());
+            throw new InvalidCredentialsException("Invalid username or password");
+        }
+        log.info("Successful sign-in with email={}", signInRequest.email());
         return userRepository.findByEmail(signInRequest.email())
                 .orElseThrow(() -> new AuthenticationServiceException(
                         String.format("User with email '%s' is not found", signInRequest.email())));

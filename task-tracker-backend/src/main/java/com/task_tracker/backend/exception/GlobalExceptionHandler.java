@@ -29,13 +29,19 @@ public class GlobalExceptionHandler {
         return jsonError(HttpStatus.BAD_REQUEST, "Validation failed");
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidCredentialsException(
+            InvalidCredentialsException ex, HttpServletRequest request) {
+        log.debug("Invalid request: uri={}, message={}", request.getRequestURI(), ex.getMessage());
+        return jsonError(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiErrorResponse> handleBadRequestException(
             BadRequestException ex, HttpServletRequest request) {
         log.debug("Bad request: uri={}, message={}", request.getRequestURI(), ex.getMessage());
         return jsonError(HttpStatus.BAD_REQUEST, "Invalid request body");
     }
-
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadableException(
