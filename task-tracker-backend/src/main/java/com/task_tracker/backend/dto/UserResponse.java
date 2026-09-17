@@ -1,6 +1,6 @@
 package com.task_tracker.backend.dto;
 
-public record SignUpResponse(
+public record UserResponse(
         Long id,
         String email) {
 }
