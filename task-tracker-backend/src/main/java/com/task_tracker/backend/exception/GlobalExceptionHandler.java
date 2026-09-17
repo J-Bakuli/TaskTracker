@@ -3,6 +3,7 @@ package com.task_tracker.backend.exception;
 import com.task_tracker.backend.dto.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,14 @@ public class GlobalExceptionHandler {
         log.warn("Validation failed: uri={}", request.getRequestURI());
         return jsonError(HttpStatus.BAD_REQUEST, "Validation failed");
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
+            BadRequestException ex, HttpServletRequest request) {
+        log.debug("Bad request: uri={}, message={}", request.getRequestURI(), ex.getMessage());
+        return jsonError(HttpStatus.BAD_REQUEST, "Invalid request body");
+    }
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadableException(

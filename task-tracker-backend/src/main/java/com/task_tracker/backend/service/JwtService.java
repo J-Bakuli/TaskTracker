@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,17 @@ import java.util.function.Function;
 public class JwtService {
     private final String secretKey;
     private final SecretKey signingKey;
-    private final int expirationMinutes;
+    @Getter
+    private final int expirationTime;
 
-    public JwtService(@Value("${jwt.secret-key}") String secretKey, @Value("${jwt.expiration-minutes}") int expirationMinutes) {
+    public JwtService(@Value("${jwt.secret-key}") String secretKey, @Value("${jwt.expiration-minutes}") int expirationTime) {
         this.secretKey = secretKey;
         this.signingKey = getSignInKey();
-        this.expirationMinutes = expirationMinutes;
+        this.expirationTime = expirationTime;
+    }
+
+    public String extractEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -31,7 +37,7 @@ public class JwtService {
     }
 
     public String generateToken(UserEntity userEntity) {
-        long expirationTimeMs = (long) expirationMinutes * 60 * 1000;
+        long expirationTimeMs = (long) expirationTime * 60 * 1000;
 
         return Jwts.builder()
                 .subject(userEntity.getEmail())
@@ -39,6 +45,11 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + expirationTimeMs))
                 .signWith(signingKey, Jwts.SIG.HS256)
                 .compact();
+    }
+
+    public boolean isTokenValid(String token, UserEntity userEntity) {
+        final String email = extractEmail(token);
+        return (email.equals(userEntity.getEmail())) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -64,7 +75,7 @@ public class JwtService {
 
     @PostConstruct
     private void validateConfig() {
-        if (expirationMinutes <= 0) {
+        if (expirationTime <= 0) {
             throw new IllegalArgumentException("jwt.expiration-minutes must be > 0");
         }
     }
