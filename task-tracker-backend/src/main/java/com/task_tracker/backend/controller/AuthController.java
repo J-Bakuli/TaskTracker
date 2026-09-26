@@ -1,9 +1,8 @@
 package com.task_tracker.backend.controller;
 
 import com.task_tracker.backend.dto.SignInRequest;
-import com.task_tracker.backend.dto.SignInResponse;
 import com.task_tracker.backend.dto.SignUpRequest;
-import com.task_tracker.backend.dto.SignUpResponse;
+import com.task_tracker.backend.dto.UserResponse;
 import com.task_tracker.backend.model.UserEntity;
 import com.task_tracker.backend.service.AuthService;
 import com.task_tracker.backend.service.JwtService;
@@ -24,18 +23,18 @@ public class AuthController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/user")
-    public SignUpResponse register(@Valid @RequestBody SignUpRequest request, HttpServletResponse response) {
+    public UserResponse register(@Valid @RequestBody SignUpRequest request, HttpServletResponse response) {
         UserEntity userEntity = authService.register(request);
         issueTokenAndSetHeader(userEntity, response);
-        return new SignUpResponse(userEntity.getId(), userEntity.getEmail());
+        return new UserResponse(userEntity.getId(), userEntity.getEmail());
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/auth/login")
-    public SignInResponse signIn(@Valid @RequestBody SignInRequest request, HttpServletResponse response) {
+    public UserResponse signIn(@Valid @RequestBody SignInRequest request, HttpServletResponse response) {
         UserEntity userEntity = authService.authenticate(request);
         issueTokenAndSetHeader(userEntity, response);
-        return new SignInResponse(userEntity.getId(), userEntity.getEmail());
+        return new UserResponse(userEntity.getId(), userEntity.getEmail());
     }
 
     private void issueTokenAndSetHeader(UserEntity userEntity, HttpServletResponse response) {
