@@ -36,6 +36,13 @@ public class GlobalExceptionHandler {
         return jsonError(HttpStatus.UNAUTHORIZED, "Unauthorized access");
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFoundException(
+            ResourceNotFoundException ex, HttpServletRequest request) {
+        log.debug("Resource not found exception: uri={}, message={}", request.getRequestURI(), ex.getMessage());
+        return jsonError(HttpStatus.NOT_FOUND, "Not found");
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiErrorResponse> handleBadRequestException(
             BadRequestException ex, HttpServletRequest request) {
