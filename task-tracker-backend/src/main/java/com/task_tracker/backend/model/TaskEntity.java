@@ -1,5 +1,6 @@
 package com.task_tracker.backend.model;
 
+import com.task_tracker.backend.dto.TaskCreateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,4 +38,14 @@ public class TaskEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
     private LocalDateTime doneAt;
+
+    public static TaskEntity createNewTaskEntity(TaskCreateRequest request, UserEntity user) {
+        TaskEntity task = new TaskEntity();
+        task.setTitle(request.title());
+        task.setDescription(request.description());
+        task.setStatus(Status.PENDING);
+        task.setUser(user);
+        task.setDoneAt(null);
+        return task;
+    }
 }
