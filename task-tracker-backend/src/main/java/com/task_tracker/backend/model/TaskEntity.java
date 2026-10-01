@@ -48,4 +48,25 @@ public class TaskEntity {
         task.setDoneAt(null);
         return task;
     }
+
+    public static TaskEntity updateTaskEntity(TaskEntity task, String newTitle, String newDescription, Status newStatus) {
+        if (newTitle != null) {
+            task.setTitle(newTitle);
+        }
+        if (newDescription != null) {
+            task.setDescription(newDescription);
+        }
+        if (newStatus != null) {
+            task.setStatus(newStatus);
+        }
+        if (task.getStatus() == Status.DONE) {
+            if (task.getDoneAt() == null) {
+                task.setDoneAt(LocalDateTime.now());
+            }
+        }
+        if (task.getStatus() == Status.PENDING) {
+            task.setDoneAt(null);
+        }
+        return task;
+    }
 }

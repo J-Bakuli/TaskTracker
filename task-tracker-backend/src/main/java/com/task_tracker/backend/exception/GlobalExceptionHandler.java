@@ -50,13 +50,6 @@ public class GlobalExceptionHandler {
         return jsonError(HttpStatus.NOT_FOUND, "Not found");
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadRequestException(
-            BadRequestException ex, HttpServletRequest request) {
-        log.debug("Bad request: uri={}, message={}", request.getRequestURI(), ex.getMessage());
-        return jsonError(HttpStatus.BAD_REQUEST, "Invalid request body");
-    }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex, HttpServletRequest request) {
