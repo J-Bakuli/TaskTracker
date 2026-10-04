@@ -10,8 +10,10 @@ import com.task_tracker.backend.repository.TaskRepository;
 import com.task_tracker.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -48,5 +50,15 @@ public class TaskService {
         TaskEntity savedEntity = taskRepository.save(taskEntity);
         log.info("Updated task for userId={}, request={}", userId, request);
         return TaskResponse.from(savedEntity);
+    }
+
+    @Transactional
+    public void deleteTask(Long userId, Long taskId) {
+        log.debug("Delete task for userId={}, taskId={}", userId, taskId);
+        Long deleted = taskRepository.deleteByIdAndUser_Id(taskId, userId);
+        if (deleted == 0) {
+            throw new ResourceNotFoundException("Task not found");
+        }
+        log.info("Deleted task for userId={}, taskId={}", userId, taskId);
     }
 }
